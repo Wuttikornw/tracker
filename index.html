@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tree QR Tracker</title>
+  <link rel="manifest" href="./manifest.json" />
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script defer src="./app.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 16px; font-size: 18px; }
+    #reader { width: 300px; margin-bottom: 16px; }
+    input { font-size: 16px; padding: 8px; width: 80%; }
+    button { font-size: 16px; padding: 8px 12px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>📷 Tree QR Tracker</h1>
+
+  <div id="reader"></div>
+
+  <div id="treeInfo" style="margin-top: 20px;"></div>
+
+  <div id="logForm" style="display: none;">
+    <input type="text" id="logText" placeholder="พิมพ์สิ่งที่ทำ เช่น รดน้ำ" />
+    <br>
+    <button onclick="saveLog()">✅ บันทึก</button>
+  </div>
+
+  <hr>
+  <button onclick="exportLogs()">📤 Export Logs (CSV)</button>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(() => console.log("✅ SW registered"))
+        .catch(err => console.error("SW failed", err));
+    }
+  </script>
+</body>
+</html>
