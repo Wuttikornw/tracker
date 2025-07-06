@@ -1,6 +1,6 @@
 let currentTreeId = "";
 let isScanning = false;
-let html5QrCode = new Html5Qrcode("reader");
+const html5QrCode = new Html5Qrcode("reader");
 
 async function toggleScan() {
   const scanBtn = document.getElementById("scanBtn");
@@ -27,13 +27,18 @@ async function toggleScan() {
 }
 
 async function onScanSuccess(decodedText) {
-  if (decodedText === currentTreeId) return;
+  if (!isScanning) return;
+  isScanning = false;
+
   currentTreeId = decodedText;
 
-  await html5QrCode.stop();
-  document.getElementById("reader").style.display = 'none';
-  isScanning = false;
-  document.getElementById("scanBtn").textContent = "📷 เริ่มสแกน QR";
+  try {
+    await html5QrCode.stop();
+    document.getElementById("reader").style.display = 'none';
+    document.getElementById("scanBtn").textContent = "📷 เริ่มสแกน QR";
+  } catch (err) {
+    console.error("❌ Failed to stop camera:", err);
+  }
 
   const trees = JSON.parse(localStorage.getItem('trees') || '{}');
   if (!trees[currentTreeId]) {
