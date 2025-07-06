@@ -9,7 +9,7 @@
   <script defer src="./app.js"></script>
   <style>
     body { font-family: sans-serif; padding: 16px; font-size: 18px; }
-    #reader { width: 300px; margin-bottom: 16px; }
+    #reader { width: 300px; margin-bottom: 16px; display: none; }
     input { font-size: 16px; padding: 8px; width: 80%; }
     button { font-size: 16px; padding: 8px 12px; margin-top: 8px; }
   </style>
@@ -17,6 +17,7 @@
 <body>
   <h1>📷 Tree QR Tracker</h1>
 
+  <button id="scanBtn" onclick="toggleScan()">📷 เริ่มสแกน QR</button>
   <div id="reader"></div>
 
   <div id="treeInfo" style="margin-top: 20px;"></div>

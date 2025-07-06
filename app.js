@@ -1,9 +1,39 @@
 let currentTreeId = "";
-let html5QrCode;
+let isScanning = false;
+let html5QrCode = new Html5Qrcode("reader");
 
-function onScanSuccess(decodedText) {
+async function toggleScan() {
+  const scanBtn = document.getElementById("scanBtn");
+
+  if (!isScanning) {
+    document.getElementById("reader").style.display = 'block';
+    try {
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      );
+      isScanning = true;
+      scanBtn.textContent = "🛑 หยุดสแกน";
+    } catch (err) {
+      alert("ไม่สามารถเปิดกล้องได้: " + err);
+    }
+  } else {
+    await html5QrCode.stop();
+    document.getElementById("reader").style.display = 'none';
+    isScanning = false;
+    scanBtn.textContent = "📷 เริ่มสแกน QR";
+  }
+}
+
+async function onScanSuccess(decodedText) {
   if (decodedText === currentTreeId) return;
   currentTreeId = decodedText;
+
+  await html5QrCode.stop();
+  document.getElementById("reader").style.display = 'none';
+  isScanning = false;
+  document.getElementById("scanBtn").textContent = "📷 เริ่มสแกน QR";
 
   const trees = JSON.parse(localStorage.getItem('trees') || '{}');
   if (!trees[currentTreeId]) {
@@ -43,7 +73,7 @@ function renderLogs() {
 
   const treeInfo = document.getElementById("treeInfo");
   const existingList = treeInfo.querySelector("ul");
-  if (existingList) existingList.remove(); // clear
+  if (existingList) existingList.remove();
   treeInfo.appendChild(logList);
 }
 
@@ -62,11 +92,3 @@ function exportLogs() {
   a.download = "tree_logs.csv";
   a.click();
 }
-
-// Start QR Scanner
-html5QrCode = new Html5Qrcode("reader");
-html5QrCode.start(
-  { facingMode: "environment" },
-  { fps: 10, qrbox: 250 },
-  onScanSuccess
-);
