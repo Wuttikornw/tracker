@@ -3,40 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tree QR Tracker</title>
-  <link rel="manifest" href="./manifest.json" />
+  <title>Tree QR Scanner</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <script defer src="./app.js"></script>
+  <link rel="manifest" href="./manifest.json" />
   <style>
     body { font-family: sans-serif; padding: 16px; font-size: 18px; }
     #reader { width: 300px; margin-bottom: 16px; display: none; }
-    input { font-size: 16px; padding: 8px; width: 80%; }
-    button { font-size: 16px; padding: 8px 12px; margin-top: 8px; }
+    input, button { font-size: 16px; padding: 8px; margin: 8px 0; }
   </style>
 </head>
 <body>
   <h1>📷 Tree QR Tracker</h1>
 
-  <button id="scanBtn" onclick="toggleScan()">📷 Scan QR</button>
-  <div id="reader" style="width: 300px; display: none;"></div>
+  <!-- ปุ่มควบคุม -->
+  <button id="scanBtn" onclick="toggleScan()">📷 เริ่มสแกน QR</button><br>
+  <label>📸 หรือเลือกรูปภาพ:</label><br>
+  <input type="file" accept="image/*" id="qrFileInput" onchange="scanFromFile(this)" />
 
-  <div id="treeInfo" style="margin-top: 20px;"></div>
+  <div id="reader"></div>
+  <div id="treeInfo"></div>
 
+  <!-- ฟอร์มบันทึก -->
   <div id="logForm" style="display: none;">
-    <input type="text" id="logText" placeholder="พิมพ์สิ่งที่ทำ เช่น รดน้ำ" />
-    <br>
+    <input id="logText" placeholder="วันนี้ทำอะไรกับต้นนี้" />
     <button onclick="saveLog()">✅ บันทึก</button>
   </div>
 
-  <hr>
+  <hr />
   <button onclick="exportLogs()">📤 Export Logs (CSV)</button>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(() => console.log("✅ SW registered"))
-        .catch(err => console.error("SW failed", err));
-    }
-  </script>
+  <script src="./app.js"></script>
 </body>
 </html>

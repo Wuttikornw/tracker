@@ -1,6 +1,6 @@
 let currentTreeId = "";
 let isScanning = false;
-const html5QrCode = new Html5Qrcode("reader");
+const html5QrCode = new Html5QrCode("reader");
 
 async function toggleScan() {
   const scanBtn = document.getElementById("scanBtn");
@@ -27,9 +27,8 @@ async function toggleScan() {
 }
 
 async function onScanSuccess(decodedText) {
-  if (!isScanning) return;
+  if (!isScanning && currentTreeId === decodedText) return;
   isScanning = false;
-
   currentTreeId = decodedText;
 
   try {
@@ -70,9 +69,16 @@ function renderLogs() {
   const logs = trees[currentTreeId]?.logs || [];
 
   const logList = document.createElement('ul');
-  logs.forEach(log => {
+  logs.forEach((log, index) => {
     const li = document.createElement('li');
-    li.textContent = `${log.date}: ${log.action}`;
+    li.textContent = `${log.date}: ${log.action} `;
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = "🗑 ลบ";
+    delBtn.style.marginLeft = "8px";
+    delBtn.onclick = () => deleteLog(index);
+    li.appendChild(delBtn);
+
     logList.appendChild(li);
   });
 
@@ -80,6 +86,18 @@ function renderLogs() {
   const existingList = treeInfo.querySelector("ul");
   if (existingList) existingList.remove();
   treeInfo.appendChild(logList);
+}
+
+function deleteLog(index) {
+  if (!confirm("ลบบันทึกนี้ใช่หรือไม่?")) return;
+
+  const trees = JSON.parse(localStorage.getItem('trees') || '{}');
+  if (!trees[currentTreeId]) return;
+
+  trees[currentTreeId].logs.splice(index, 1);
+  localStorage.setItem('trees', JSON.stringify(trees));
+
+  renderLogs();
 }
 
 function exportLogs() {
@@ -96,4 +114,21 @@ function exportLogs() {
   a.href = URL.createObjectURL(blob);
   a.download = "tree_logs.csv";
   a.click();
+}
+
+async function scanFromFile(input) {
+  if (input.files.length === 0) return;
+
+  const file = input.files[0];
+  const fileScanner = new Html5Qrcode("reader"); // ใช้ instance แยกสำหรับไฟล์
+
+  try {
+    const result = await fileScanner.scanFile(file, true);
+    onScanSuccess(result);
+  } catch (err) {
+    alert("❌ ไม่พบ QR ในภาพนี้");
+    console.error(err);
+  }
+
+  input.value = "";
 }
